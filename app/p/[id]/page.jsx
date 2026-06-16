@@ -1,22 +1,34 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Copy, Check, Loader2, ArrowLeft, Clock, Eye } from "lucide-react";
+import Link from "next/link";
 
 export default function ViewPaste({ params }) {
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
-  const [pastes, setPastes] = useState("");
-  const [expiresAt, setExpiresAt] = useState(null);
-  const [expiresAtEpoch, setExpiresAtEpoch] = useState(null);
+  const [content, setContent] = useState("");
   const [viewsRemaining, setViewsRemaining] = useState(null);
   const [remainingSec, setRemainingSec] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
 
   const formatTime = (seconds) => {
-    if (seconds === null) return "-";
-    if (seconds <= 0) return "00:00:00 (Expired)";
+    if (seconds === null) return "Never";
+    if (seconds <= 0) return "Expired";
 
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -24,7 +36,8 @@ export default function ViewPaste({ params }) {
 
     const pad = (n) => String(n).padStart(2, "0");
 
-    return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+    if (hours > 0) return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+    return `${pad(minutes)}:${pad(secs)}`;
   };
 
   const fetchData = async (id) => {
@@ -37,9 +50,7 @@ export default function ViewPaste({ params }) {
         return;
       }
 
-      setPastes(data.content);
-      setExpiresAt(data.expired_at);
-      setExpiresAtEpoch(data.expires_at_epoch);
+      setContent(data.content);
       setViewsRemaining(data.remaining_views);
 
       if (data.expires_at_epoch) {
@@ -47,22 +58,25 @@ export default function ViewPaste({ params }) {
         const now = Date.now();
         const diffInSeconds = Math.floor((expiryTime - now) / 1000);
         setRemainingSec(diffInSeconds > 0 ? diffInSeconds : 0);
-        // setRemainingSec(Number(data.expiresAtEpoch) - Date.now());
       }
 
       toast.success(`Paste fetched successfully`);
     } catch (error) {
       console.error(error);
+      toast.error("An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (remainingSec === 0) setError("Paste Expired");
+    if (remainingSec === 0) {
+        setError("Paste Expired");
+        return;
+    }
     if (remainingSec !== null && remainingSec > 0) {
       const interval = setInterval(() => {
-        setRemainingSec((prev) => Number(prev) - 1);
+        setRemainingSec((prev) => (prev > 0 ? prev - 1 : 0));
       }, 1000);
 
       return () => clearInterval(interval);
@@ -75,100 +89,80 @@ export default function ViewPaste({ params }) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(pastes);
+      await navigator.clipboard.writeText(content);
       setCopied(true);
       toast.success("Paste copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast.error("Failed to copy");
-      console.error(err);
     }
   };
-  return (
-    <div className="py-2 w-screen bg-white flex justify-center">
-      {loading ? (
-        <div className="text-center text-gray-900 max-w-md min-h-[80vh] pt-10">
-          <span className="flex items-center justify-center gap-1">
-            Loading
-            <span className="flex gap-0.5">
-              <span className="animate-bounce delay-0">.</span>
-              <span className="animate-bounce delay-100">.</span>
-              <span className="animate-bounce delay-200">.</span>
-            </span>
-          </span>
-        </div>
-      ) : error ? (
-        <div className="text-center max-w-md min-h-[80vh] pt-10">
-          <h1 className="text-6xl font-bold text-gray-800 mb-4">404</h1>
-          <p className="text-xl text-gray-600 mb-2">Paste not found</p>
-          <p className="text-sm text-gray-500 mb-8">{error}</p>
-          <a
-            href="/"
-            className="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition-colors"
-          >
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">Fetching your paste...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-20 px-4 max-w-md text-center">
+        <h1 className="text-6xl font-bold mb-4">404</h1>
+        <p className="text-xl text-muted-foreground mb-8">{error}</p>
+        <Button asChild>
+          <Link href="/">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Create New Paste
-          </a>
-        </div>
-      ) : (
-        <div className="px-2 flex flex-col gap-2 w-full md:w-1/2 text-gray-900">
-          <div className="flex flex-col w-full gap-2 flex-wrap">
-            <div>
-              <label>Paste : </label>
-              <input
-                type="text"
-                value={id}
-                className="border px-2 rounded border-gray-300"
-                disabled
-              />
-            </div>
-            <div>
-              <label>Expires In : </label>
-              <input
-                type="text"
-                value={formatTime(remainingSec)}
-                className="border px-2 rounded border-gray-300"
-                disabled
-              />
-            </div>
-            <div>
-              <label>Views Remaining : </label>
-              <input
-                type="text"
-                value={viewsRemaining ?? "-"}
-                className="border px-2 rounded border-gray-300"
-                disabled
-              />
-            </div>
-          </div>
+          </Link>
+        </Button>
+      </div>
+    );
+  }
 
-          <div className="flex justify-between items-center mt-4 w-full">
-            <label className="font-medium text-gray-700">Paste Content:</label>
-            <button
-              className={`px-4 py-2 rounded font-medium transition-colors ${
-                copied
-                  ? "bg-green-600 text-white"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
-              onClick={handleCopy}
-            >
-              {copied ? "Copied" : "Copy"}
-            </button>
-          </div>
-
-          <div className="border-2 rounded min-h-[50vh] w-full p-2 border-gray-300">
-            <textarea
-              value={pastes}
-              cols={50}
-              rows={20}
-              className="w-full font-semibold grow"
-              style={{
-                fontFamily: "'Courier New', Courier, monospace",
-                fontSize: "16px",
-              }}
-            />
-          </div>
+  return (
+    <div className="container mx-auto py-10 px-4 max-w-5xl">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild className="-ml-2">
+            <Link href="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Link>
+          </Button>
+          <h1 className="text-xl font-bold font-mono">Paste: {id}</h1>
         </div>
-      )}
+        <div className="flex gap-2">
+            {remainingSec !== null && (
+                <Badge variant="outline" className="flex items-center gap-1.5 py-1">
+                    <Clock className="h-3.5 w-3.5" />
+                    {formatTime(remainingSec)}
+                </Badge>
+            )}
+            {viewsRemaining !== null && (
+                <Badge variant="outline" className="flex items-center gap-1.5 py-1">
+                    <Eye className="h-3.5 w-3.5" />
+                    {viewsRemaining} views left
+                </Badge>
+            )}
+            <Button onClick={handleCopy} size="sm">
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                <span className="ml-2">{copied ? "Copied" : "Copy"}</span>
+            </Button>
+        </div>
+      </div>
+
+      <Card>
+        <CardContent className="p-0">
+          <Textarea
+            readOnly
+            value={content}
+            className="min-h-[60vh] font-mono p-6 resize-none border-none focus-visible:ring-0 rounded-none rounded-t-lg"
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
