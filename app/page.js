@@ -154,20 +154,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="ttl">Time To Live (TTL)</Label>
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="h-auto p-0"
-                  onClick={() => {
-                    setUseCustomTime(!useCustomTime);
-                    setTtl("");
-                  }}
-                >
-                  {useCustomTime ? "Use Quick Options" : "Use Custom Time"}
-                </Button>
-              </div>
+              <Label htmlFor="ttl">Time To Live (TTL)</Label>
               {useCustomTime ? (
                 <div className="flex gap-2">
                   <Input
@@ -208,6 +195,17 @@ export default function Home() {
                   </Button>
                 </div>
               )}
+              <Button
+                variant="link"
+                size="sm"
+                className="h-auto p-0"
+                onClick={() => {
+                  setUseCustomTime(!useCustomTime);
+                  setTtl("");
+                }}
+              >
+                {useCustomTime ? "Use Quick Options" : "Use Custom Time"}
+              </Button>
             </div>
 
             <div className="space-y-2">
