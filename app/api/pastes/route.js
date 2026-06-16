@@ -50,9 +50,15 @@ export async function POST(req) {
     }
 
     let expiryTime = null;
+    let ttlVal = null;
+    if (ttl_seconds && ttl_seconds !== "") {
+      ttlVal = Number(ttl_seconds);
+      expiryTime = Number(currentTime) + ttlVal * 1000;
+    }
 
-    if (ttl_seconds) {
-      expiryTime = Number(currentTime) + Number(ttl_seconds) * 1000;
+    let maxViewsVal = null;
+    if (max_views && max_views !== "") {
+      maxViewsVal = Number(max_views);
     }
 
     await savePaste(
@@ -60,8 +66,9 @@ export async function POST(req) {
       content,
       currentTime,
       expiryTime,
-      ttl_seconds === "" ? null : ttl_seconds,
-      max_views === "" ? null : max_views
+      ttlVal,
+      maxViewsVal,
+      maxViewsVal
     );
 
     return Response.json(

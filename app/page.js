@@ -89,12 +89,14 @@ export default function Home() {
   };
 
   const createLink = async () => {
+    console.log("createLink called", { paste: !!paste, ttl, maxViews });
     if (!paste.trim()) {
       toast.error("Paste content is required!");
       return;
     }
     setLoading(true);
     try {
+      console.log("Fetching /api/pastes...");
       const response = await fetch("/api/pastes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,6 +107,7 @@ export default function Home() {
         }),
       });
       const data = await response.json();
+      console.log("Response received", { status: response.status, data });
       if (!response.ok) {
         toast.error(data.error || "Failed to create paste");
         return;
@@ -113,7 +116,7 @@ export default function Home() {
       toast.success("Paste Saved Successfully.");
       setPublicLink(`${window.location.origin}/p/${id}`);
     } catch (error) {
-      console.error(error);
+      console.error("Error in createLink:", error);
       toast.error("An error occurred");
     } finally {
       setLoading(false);
