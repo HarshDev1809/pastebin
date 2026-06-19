@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Navbar } from "@/lib/components/Navbar";
 import { Footer } from "@/lib/components/Footer";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const ubuntu = Ubuntu({
   variable: "--font-ubuntu",
@@ -22,14 +23,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${ubuntu.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col font-sans`}>
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Toaster position="top-right" richColors />
-        <Footer />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Toaster position="top-right" richColors />
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

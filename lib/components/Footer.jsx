@@ -62,7 +62,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/" className="hover:underline text-foreground/80">Create Paste</a>
+                <Link href="/" className="hover:underline text-foreground/80">Create Paste</Link>
               </li>
             </ul>
           </div>
