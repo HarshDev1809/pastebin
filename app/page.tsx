@@ -60,12 +60,12 @@ export default function Home() {
   const [useCustomTime, setUseCustomTime] = useState(false);
   const [maxViews, setMaxViews] = useState("");
   const [loading, setLoading] = useState(false);
-  const [publicLink, setPublicLink] = useState(null);
+  const [publicLink, setPublicLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleTtlInputChange = (e) => {
+  const handleTtlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (value && value < 1) {
+    if (value && parseInt(value) < 1) {
       toast.error("TTL can't be less than 1 sec");
       setTtl("");
       return;
@@ -73,14 +73,14 @@ export default function Home() {
     setTtl(value);
   };
 
-  const handleMaxViewsChange = (e) => {
+  const handleMaxViewsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     if (value && isNaN(parseInt(value))) {
       toast.error("Max Views must be a number");
       setMaxViews("");
       return;
     }
-    if (value && value < 1) {
+    if (value && parseInt(value) < 1) {
       toast.error("Max Views can't be less than 1");
       setMaxViews("");
       return;
@@ -124,6 +124,7 @@ export default function Home() {
   };
 
   const copyToClipboard = async () => {
+    if (!publicLink) return;
     try {
       await navigator.clipboard.writeText(publicLink);
       setCopied(true);
@@ -177,7 +178,7 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <Select value={ttl} onValueChange={setTtl}>
+                  <Select value={ttl} onValueChange={(val) => setTtl(val || "")}>
                     <SelectTrigger id="ttl">
                       <SelectValue placeholder="Select expiration" />
                     </SelectTrigger>

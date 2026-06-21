@@ -1,7 +1,7 @@
 import { savePaste } from "@/lib/db";
 import { nanoid } from "nanoid";
 
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { content = null, ttl_seconds = null, max_views = null } = body;
@@ -67,7 +67,6 @@ export async function POST(req) {
       currentTime,
       expiryTime,
       ttlVal,
-      maxViewsVal,
       maxViewsVal
     );
 
@@ -75,7 +74,7 @@ export async function POST(req) {
       { id, url: `${process.env.NEXT_PUBLIC_APP_URL}/p/${id}` },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     return Response.json({ error: error.message }, { status: 500 });

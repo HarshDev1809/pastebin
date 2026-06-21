@@ -17,16 +17,16 @@ import { Badge } from "@/components/ui/badge";
 import { Copy, Check, Loader2, ArrowLeft, Clock, Eye } from "lucide-react";
 import Link from "next/link";
 
-export default function ViewPaste({ params }) {
+export default function ViewPaste({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState("");
-  const [viewsRemaining, setViewsRemaining] = useState(null);
-  const [remainingSec, setRemainingSec] = useState(null);
-  const [error, setError] = useState(null);
+  const [viewsRemaining, setViewsRemaining] = useState<number | null>(null);
+  const [remainingSec, setRemainingSec] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number | null) => {
     if (seconds === null) return "Never";
     if (seconds <= 0) return "Expired";
 
@@ -34,13 +34,13 @@ export default function ViewPaste({ params }) {
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
 
-    const pad = (n) => String(n).padStart(2, "0");
+    const pad = (n: number) => String(n).padStart(2, "0");
 
     if (hours > 0) return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
     return `${pad(minutes)}:${pad(secs)}`;
   };
 
-  const fetchData = async (id) => {
+  const fetchData = async (id: string) => {
     try {
       const res = await fetch(`/api/pastes/${id}`);
       const data = await res.json();
@@ -76,7 +76,7 @@ export default function ViewPaste({ params }) {
     }
     if (remainingSec !== null && remainingSec > 0) {
       const interval = setInterval(() => {
-        setRemainingSec((prev) => (prev > 0 ? prev - 1 : 0));
+        setRemainingSec((prev) => ((prev !== null && prev > 0) ? prev - 1 : 0));
       }, 1000);
 
       return () => clearInterval(interval);
@@ -112,8 +112,8 @@ export default function ViewPaste({ params }) {
       <div className="container mx-auto py-20 px-4 max-w-md text-center">
         <h1 className="text-6xl font-bold mb-4">404</h1>
         <p className="text-xl text-muted-foreground mb-8">{error}</p>
-        <Button asChild>
-          <Link href="/">
+        <Button>
+          <Link href="/" className="flex items-center">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Create New Paste
           </Link>
@@ -126,8 +126,8 @@ export default function ViewPaste({ params }) {
     <div className="container mx-auto py-10 px-4 max-w-5xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild className="-ml-2">
-            <Link href="/">
+          <Button variant="ghost" size="sm" className="-ml-2">
+            <Link href="/" className="flex items-center">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Link>

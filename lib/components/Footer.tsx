@@ -1,7 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-const GithubIcon = (props) => (
+const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
@@ -19,7 +19,7 @@ const GithubIcon = (props) => (
   </svg>
 );
 
-const LinkedinIcon = (props) => (
+const LinkedinIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"

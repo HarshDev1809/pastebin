@@ -6,12 +6,12 @@ const pool = new Pool({
 });
 
 export const savePaste = async (
-  id,
-  content,
-  currentTime,
-  expiryTime,
-  ttl_seconds = null,
-  max_views = null
+  id: string,
+  content: string,
+  currentTime: number,
+  expiryTime: number | null,
+  ttl_seconds: number | null = null,
+  max_views: number | null = null
 ) => {
   try {
     await pool.query(
@@ -25,7 +25,7 @@ export const savePaste = async (
   }
 };
 
-export const fetchPaste = async(id)=>{
+export const fetchPaste = async(id: string)=>{
     try{
         const {rows} = await pool.query(`SELECT * FROM pastes WHERE id = $1`,[id])
         const data = rows[0];
@@ -37,7 +37,7 @@ export const fetchPaste = async(id)=>{
     }
 }
 
-export const updateView = async(id,updatedView)=>{
+export const updateView = async(id: string, updatedView: number)=>{
     try{
         await pool.query(`UPDATE pastes SET remaining_views = $1 WHERE id = $2`,[updatedView,id]);
     }catch(error){
