@@ -1,11 +1,19 @@
 import { savePaste } from "@/lib/db";
 import { nanoid } from "nanoid";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { content = null, ttl_seconds = null, max_views = null } = body;
+    const { heading = null, content = null, ttl_seconds = null, max_views = null } = body;
     const testTime = req.headers.get("x-test-now-ms");
+
+    const session = await auth.api.getSession({
+      headers: await headers()
+    });
+
+    const userId = session?.user?.id || null;
 
     if (
       !content ||
@@ -63,7 +71,9 @@ export async function POST(req: Request) {
 
     await savePaste(
       id,
+      heading,
       content,
+      userId,
       currentTime,
       expiryTime,
       ttlVal,

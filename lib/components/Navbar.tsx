@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
+import { UserMenu } from "./UserMenu";
 
 export const Navbar = () => {
   return (
@@ -14,8 +15,8 @@ export const Navbar = () => {
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <nav className="flex items-center space-x-4">
-            {/* Add nav items here if needed */}
             <ThemeToggle />
+            <UserMenu />
           </nav>
         </div>
       </div>

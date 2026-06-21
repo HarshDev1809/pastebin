@@ -9,7 +9,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const data = await fetchPaste(id);
     if(!data)
         return Response.json({ error: "Invalid id passed" }, { status: 404 });
-    const { max_views, content, remaining_views, expires_at } = data;
+    const { maxViews: max_views, content, heading, remainingViews: remaining_views, expiresAt: expires_at } = data;
 
     let currentTime = Date.now();
 
@@ -37,9 +37,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
     return Response.json(
       {
+        heading,
         content,
         remaining_views,
-        expires_at: expires_at === null ? null : new Date(expires_at/1000).toISOString(),
+        expires_at: expires_at === null ? null : new Date(Number(expires_at)).toISOString(),
         expires_at_epoch: expires_at,
       },
       { status: 200 }

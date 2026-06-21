@@ -1,47 +1,59 @@
-import { Pool } from "pg";
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+import { db } from "./db/index";
+import { pastes } from "./db/schema";
+import { eq, desc } from "drizzle-orm";
 
 export const savePaste = async (
   id: string,
+  heading: string | null,
   content: string,
+  userId: string | null,
   currentTime: number,
   expiryTime: number | null,
   ttl_seconds: number | null = null,
   max_views: number | null = null
 ) => {
   try {
-    await pool.query(
-      `INSERT INTO pastes (id,content,created_at,expires_at,ttl_seconds,remaining_views,max_views)
-            VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-      [id, content, currentTime, expiryTime, ttl_seconds, max_views, max_views]
-    );
+    await db.insert(pastes).values({
+      id,
+      heading,
+      content,
+      userId,
+      createdAt: currentTime,
+      expiresAt: expiryTime,
+      ttlSeconds: ttl_seconds,
+      remainingViews: max_views,
+      maxViews: max_views,
+    });
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const fetchPaste = async(id: string)=>{
-    try{
-        const {rows} = await pool.query(`SELECT * FROM pastes WHERE id = $1`,[id])
-        const data = rows[0];
-        return data
-    }catch(error){
-        console.error(error);
+export const fetchPaste = async (id: string) => {
+  try {
+    const data = await db.select().from(pastes).where(eq(pastes.id, id));
+    return data[0] || null;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 
-        throw error;
-    }
-}
+export const updateView = async (id: string, updatedView: number) => {
+  try {
+    await db.update(pastes).set({ remainingViews: updatedView }).where(eq(pastes.id, id));
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 
-export const updateView = async(id: string, updatedView: number)=>{
-    try{
-        await pool.query(`UPDATE pastes SET remaining_views = $1 WHERE id = $2`,[updatedView,id]);
-    }catch(error){
-        console.error(error);
-        throw error;
-    }
-}
+export const fetchUserPastes = async (userId: string) => {
+  try {
+    return await db.select().from(pastes).where(eq(pastes.userId, userId)).orderBy(desc(pastes.createdAt));
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
