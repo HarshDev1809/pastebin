@@ -6,12 +6,12 @@ import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon
 
 const Toaster = ({
   ...props
-}) => {
+}: React.ComponentProps<typeof Sonner>) => {
   const { theme = "system" } = useTheme()
 
   return (
     <Sonner
-      theme={theme}
+      theme={theme as React.ComponentProps<typeof Sonner>["theme"]}
       className="toaster group"
       icons={{
         success: (
@@ -36,7 +36,7 @@ const Toaster = ({
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)"
-        }
+        } as React.CSSProperties
       }
       toastOptions={{
         classNames: {

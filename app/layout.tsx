@@ -21,7 +21,7 @@ export const metadata = {
   description: "A minimalist pastebin for sharing code and text snippets.",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${ubuntu.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col font-sans`}>

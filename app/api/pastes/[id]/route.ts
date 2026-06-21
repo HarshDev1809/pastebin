@@ -1,6 +1,6 @@
 import { fetchPaste, updateView } from "@/lib/db";
 
-export async function GET(req, { params }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const testTime = req.headers.get("x-test-now-ms");
@@ -14,7 +14,7 @@ export async function GET(req, { params }) {
     let currentTime = Date.now();
 
     if (process.env.TEST_MODE === "1" && testTime) {
-      currentTime = testTime;
+      currentTime = Number(testTime);
     }
 
     if (expires_at !== null)
