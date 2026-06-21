@@ -234,7 +234,7 @@ export default function Home() {
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button
-            className="w-full"
+            className="w-full dark:text-primary dark:bg-primary-foreground"
             size="lg"
             onClick={createLink}
             disabled={loading}
