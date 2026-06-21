@@ -15,18 +15,16 @@ export async function loginAction(data: LoginInput) {
   const { email, password } = result.data;
   const currentHeaders = await headers();
 
-  const response = await auth.api.signInEmail({
-    body: {
-      email,
-      password,
-    },
-    asResponse: true,
-    headers: currentHeaders
-  });
-
-  if (response.status !== 200) {
-      const data = await response.json();
-      return { error: data.message || "An error occurred during login." };
+  try {
+      await auth.api.signInEmail({
+        body: {
+          email,
+          password,
+        },
+        headers: currentHeaders
+      });
+  } catch (err: any) {
+    return { error: err.message || "An error occurred during login." };
   }
 
   redirect("/");
@@ -39,22 +37,21 @@ export async function signupAction(data: SignupInput) {
     return { error: "Invalid data provided." };
   }
 
-  const { email, password, name } = result.data;
+  const { email, password, name, phoneNumber } = result.data;
   const currentHeaders = await headers();
 
-  const response = await auth.api.signUpEmail({
-    body: {
-      email,
-      password,
-      name,
-    },
-    asResponse: true,
-    headers: currentHeaders
-  });
-
-  if (response.status !== 200) {
-      const data = await response.json();
-      return { error: data.message || "An error occurred during signup." };
+  try {
+      await auth.api.signUpEmail({
+        body: {
+          email,
+          password,
+          name,
+          phoneNumber: phoneNumber || undefined,
+        },
+        headers: currentHeaders
+      });
+  } catch (err: any) {
+    return { error: err.message || "An error occurred during signup." };
   }
 
   redirect("/");
