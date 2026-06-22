@@ -24,6 +24,9 @@ export async function loginAction(data: LoginInput) {
         headers: currentHeaders
       });
   } catch (err: any) {
+    if (err.message === "NEXT_REDIRECT" || err.digest?.startsWith("NEXT_REDIRECT")) {
+      throw err;
+    }
     const detailedError = err.body?.message || err.message || "An error occurred during login.";
     return {
       error: process.env.NODE_ENV === "development"
@@ -56,6 +59,9 @@ export async function signupAction(data: SignupInput) {
         headers: currentHeaders
       });
   } catch (err: any) {
+    if (err.message === "NEXT_REDIRECT" || err.digest?.startsWith("NEXT_REDIRECT")) {
+      throw err;
+    }
     const detailedError = err.body?.message || err.message || "An error occurred during signup.";
     return {
       error: process.env.NODE_ENV === "development"

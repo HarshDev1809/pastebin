@@ -39,7 +39,11 @@ export default function SignupPage() {
       if (result?.error) {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Allow redirect errors from better-auth or custom logic to pass
+      if (error?.message === "NEXT_REDIRECT" || error?.digest?.startsWith("NEXT_REDIRECT")) {
+        throw error;
+      }
       toast.error("An unexpected error occurred.");
     } finally {
       setIsLoading(false);
