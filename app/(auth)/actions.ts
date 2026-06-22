@@ -24,7 +24,12 @@ export async function loginAction(data: LoginInput) {
         headers: currentHeaders
       });
   } catch (err: any) {
-    return { error: err.message || "An error occurred during login." };
+    const detailedError = err.body?.message || err.message || "An error occurred during login.";
+    return {
+      error: process.env.NODE_ENV === "development"
+        ? detailedError
+        : "An error occurred during login."
+    };
   }
 
   redirect("/");
@@ -51,7 +56,12 @@ export async function signupAction(data: SignupInput) {
         headers: currentHeaders
       });
   } catch (err: any) {
-    return { error: err.message || "An error occurred during signup." };
+    const detailedError = err.body?.message || err.message || "An error occurred during signup.";
+    return {
+      error: process.env.NODE_ENV === "development"
+        ? detailedError
+        : "An error occurred during signup."
+    };
   }
 
   redirect("/");
