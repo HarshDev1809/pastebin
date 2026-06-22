@@ -21,6 +21,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState("");
+  const [heading, setHeading] = useState<string | null>(null);
   const [viewsRemaining, setViewsRemaining] = useState<number | null>(null);
   const [remainingSec, setRemainingSec] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +52,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
       }
 
       setContent(data.content);
+      setHeading(data.heading);
       setViewsRemaining(data.remaining_views);
 
       if (data.expires_at_epoch) {
@@ -132,7 +134,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
               Back
             </Link>
           </Button>
-          <h1 className="text-xl font-bold font-mono">Paste: {id}</h1>
+          <h1 className="text-xl font-bold font-mono">{heading || "Untitled Paste"}</h1>
         </div>
         <div className="flex gap-2">
             {remainingSec !== null && (
