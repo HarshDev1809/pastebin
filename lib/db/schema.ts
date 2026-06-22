@@ -47,10 +47,11 @@ export const verification = pgTable("verification", {
 					updatedAt: timestamp('updatedAt')
 				});
 
-export const pastes = pgTable("pastes", {
+export const snippets = pgTable("snippets", {
   id: text("id").primaryKey(),
   heading: text("heading"),
   content: text("content").notNull(),
+  language: text("language").notNull().default("plaintext"),
   userId: text("user_id").references(() => user.id),
   createdAt: bigint("created_at", { mode: 'number' }).notNull(),
   expiresAt: bigint("expires_at", { mode: 'number' }),

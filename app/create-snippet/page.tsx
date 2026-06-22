@@ -23,6 +23,14 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Copy, Loader2, Check } from "lucide-react";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { python } from "@codemirror/lang-python";
+import { cpp } from "@codemirror/lang-cpp";
+import { go } from "@codemirror/lang-go";
+import { json } from "@codemirror/lang-json";
 
 const TTL_OPTIONS = [
   { value: "0", label: "Never expire" },
@@ -54,9 +62,10 @@ const TTL_OPTIONS = [
   { value: "2592000", label: "30 days" },
 ];
 
-export default function CreatePastePage() {
+export default function CreateSnippetPage() {
   const [heading, setHeading] = useState("");
-  const [paste, setPaste] = useState("");
+  const [snippet, setSnippet] = useState("");
+  const [language, setLanguage] = useState("plaintext");
   const [ttl, setTtl] = useState("");
   const [useCustomTime, setUseCustomTime] = useState(false);
   const [maxViews, setMaxViews] = useState("");
@@ -90,20 +99,21 @@ export default function CreatePastePage() {
   };
 
   const createLink = async () => {
-    console.log("createLink called", { paste: !!paste, ttl, maxViews });
-    if (!paste.trim()) {
-      toast.error("Paste content is required!");
+    console.log("createLink called", { snippet: !!snippet, ttl, maxViews });
+    if (!snippet.trim()) {
+      toast.error("Snippet content is required!");
       return;
     }
     setLoading(true);
     try {
-      console.log("Fetching /api/pastes...");
-      const response = await fetch("/api/pastes", {
+      console.log("Fetching /api/snippets...");
+      const response = await fetch("/api/snippets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           heading: heading.trim() || undefined,
-          content: paste,
+          content: snippet,
+          language,
           ttl_seconds: ttl === "0" ? "" : ttl,
           max_views: maxViews,
         }),
@@ -111,12 +121,12 @@ export default function CreatePastePage() {
       const data = await response.json();
       console.log("Response received", { status: response.status, data });
       if (!response.ok) {
-        toast.error(data.error || "Failed to create paste");
+        toast.error(data.error || "Failed to create snippet");
         return;
       }
       const { id } = data;
-      toast.success("Paste Saved Successfully.");
-      setPublicLink(`${window.location.origin}/p/${id}`);
+      toast.success("Snippet Saved Successfully.");
+      setPublicLink(`${window.location.origin}/s/${id}`);
     } catch (error) {
       console.error("Error in createLink:", error);
       toast.error("An error occurred");
@@ -141,7 +151,7 @@ export default function CreatePastePage() {
     <div className="container mx-auto py-10 px-4 max-w-4xl">
       <Card className="border-none shadow-none sm:border sm:shadow-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Create New Paste</CardTitle>
+          <CardTitle className="text-2xl">Create New Snippet</CardTitle>
           <CardDescription>
             Share your code or text snippets instantly.
           </CardDescription>
@@ -158,14 +168,43 @@ export default function CreatePastePage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="paste">Paste Content</Label>
-            <Textarea
-              id="paste"
-              placeholder="Enter your paste here..."
-              className="min-h-[300px] font-mono"
-              value={paste}
-              onChange={(e) => setPaste(e.target.value)}
-            />
+            <div className="flex justify-between items-center mb-2">
+              <Label htmlFor="snippet">Snippet Content</Label>
+              <Select value={language} onValueChange={(val) => setLanguage(val || "plaintext")}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="plaintext">Plain Text</SelectItem>
+                  <SelectItem value="javascript">JavaScript</SelectItem>
+                  <SelectItem value="typescript">TypeScript</SelectItem>
+                  <SelectItem value="html">HTML</SelectItem>
+                  <SelectItem value="css">CSS</SelectItem>
+                  <SelectItem value="python">Python</SelectItem>
+                  <SelectItem value="cpp">C++</SelectItem>
+                  <SelectItem value="go">Go</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="border rounded-md overflow-hidden">
+              <CodeMirror
+                value={snippet}
+                height="300px"
+                extensions={[
+                  language === "javascript" ? javascript({ jsx: true }) : [],
+                  language === "typescript" ? javascript({ jsx: true, typescript: true }) : [],
+                  language === "html" ? html() : [],
+                  language === "css" ? css() : [],
+                  language === "python" ? python() : [],
+                  language === "cpp" ? cpp() : [],
+                  language === "go" ? go() : [],
+                  language === "json" ? json() : [],
+                ].flat()}
+                onChange={(value) => setSnippet(value)}
+                theme="dark"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

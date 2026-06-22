@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Pastebin-Lite | Simple & Modern Pastebin",
-  description: "A minimalist pastebin for sharing code and text snippets.",
+  title: "Snippet-Lite | Simple & Modern Snippet",
+  description: "A minimalist snippet for sharing code and text snippets.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

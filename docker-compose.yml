@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: pastebin-lite-app
+    container_name: snippet-lite-app
     env_file:
       - .env
     restart: unless-stopped

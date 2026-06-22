@@ -1,4 +1,4 @@
-import { savePaste } from "@/lib/db";
+import { saveSnippet } from "@/lib/db";
 import { nanoid } from "nanoid";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { heading = null, content = null, ttl_seconds = null, max_views = null } = body;
+    const { heading = null, content = null, language = "plaintext", ttl_seconds = null, max_views = null } = body;
     const testTime = req.headers.get("x-test-now-ms");
 
     const session = await auth.api.getSession({
@@ -69,10 +69,11 @@ export async function POST(req: Request) {
       maxViewsVal = Number(max_views);
     }
 
-    await savePaste(
+    await saveSnippet(
       id,
       heading,
       content,
+      language,
       userId,
       currentTime,
       expiryTime,
@@ -81,7 +82,7 @@ export async function POST(req: Request) {
     );
 
     return Response.json(
-      { id, url: `${process.env.NEXT_PUBLIC_APP_URL}/p/${id}` },
+      { id, url: `${process.env.NEXT_PUBLIC_APP_URL}/s/${id}` },
       { status: 201 }
     );
   } catch (error: any) {

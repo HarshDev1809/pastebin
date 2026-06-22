@@ -15,13 +15,22 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Copy, Check, Loader2, ArrowLeft, Clock, Eye } from "lucide-react";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { python } from "@codemirror/lang-python";
+import { cpp } from "@codemirror/lang-cpp";
+import { go } from "@codemirror/lang-go";
+import { json } from "@codemirror/lang-json";
 import Link from "next/link";
 
-export default function ViewPaste({ params }: { params: Promise<{ id: string }> }) {
+export default function ViewSnippet({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState("");
   const [heading, setHeading] = useState<string | null>(null);
+  const [language, setLanguage] = useState("plaintext");
   const [viewsRemaining, setViewsRemaining] = useState<number | null>(null);
   const [remainingSec, setRemainingSec] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,16 +52,17 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
 
   const fetchData = async (id: string) => {
     try {
-      const res = await fetch(`/api/pastes/${id}`);
+      const res = await fetch(`/api/snippets/${id}`);
       const data = await res.json();
       if (!res.ok) {
         setError(data.error);
-        toast.error(data.error || "Failed to fetch Paste");
+        toast.error(data.error || "Failed to fetch Snippet");
         return;
       }
 
       setContent(data.content);
       setHeading(data.heading);
+      setLanguage(data.language || "plaintext");
       setViewsRemaining(data.remaining_views);
 
       if (data.expires_at_epoch) {
@@ -62,7 +72,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
         setRemainingSec(diffInSeconds > 0 ? diffInSeconds : 0);
       }
 
-      toast.success(`Paste fetched successfully`);
+      toast.success(`Snippet fetched successfully`);
     } catch (error) {
       console.error(error);
       toast.error("An error occurred");
@@ -73,7 +83,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     if (remainingSec === 0) {
-        setError("Paste Expired");
+        setError("Snippet Expired");
         return;
     }
     if (remainingSec !== null && remainingSec > 0) {
@@ -93,7 +103,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
     try {
       await navigator.clipboard.writeText(content);
       setCopied(true);
-      toast.success("Paste copied to clipboard!");
+      toast.success("Snippet copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast.error("Failed to copy");
@@ -104,7 +114,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground">Fetching your paste...</p>
+        <p className="text-muted-foreground">Fetching your snippet...</p>
       </div>
     );
   }
@@ -117,7 +127,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
         <Button>
           <Link href="/" className="flex items-center">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Create New Paste
+            Create New Snippet
           </Link>
         </Button>
       </div>
@@ -134,7 +144,7 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
               Back
             </Link>
           </Button>
-          <h1 className="text-xl font-bold font-mono">{heading || "Untitled Paste"}</h1>
+          <h1 className="text-xl font-bold font-mono">{heading || "Untitled Snippet"}</h1>
         </div>
         <div className="flex gap-2">
             {remainingSec !== null && (
@@ -157,11 +167,24 @@ export default function ViewPaste({ params }: { params: Promise<{ id: string }> 
       </div>
 
       <Card>
-        <CardContent className="p-0">
-          <Textarea
-            readOnly
+        <CardContent className="p-0 overflow-hidden rounded-md">
+          <CodeMirror
             value={content}
-            className="min-h-[60vh] font-mono p-6 resize-none border-none focus-visible:ring-0 rounded-none rounded-t-lg"
+            height="100%"
+            minHeight="60vh"
+            readOnly
+            editable={false}
+            extensions={[
+              language === "javascript" ? javascript({ jsx: true }) : [],
+              language === "typescript" ? javascript({ jsx: true, typescript: true }) : [],
+              language === "html" ? html() : [],
+              language === "css" ? css() : [],
+              language === "python" ? python() : [],
+              language === "cpp" ? cpp() : [],
+              language === "go" ? go() : [],
+              language === "json" ? json() : [],
+            ].flat()}
+            theme="dark"
           />
         </CardContent>
       </Card>

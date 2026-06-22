@@ -9,7 +9,7 @@ export const Navbar = () => {
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="text-xl font-bold sm:inline-block">
-              Pastebin<span className="text-primary">-Lite</span>
+              Snippet<span className="text-primary">-Lite</span>
             </span>
           </Link>
         </div>

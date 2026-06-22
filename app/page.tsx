@@ -9,13 +9,13 @@ export default function LandingPage() {
           Share your code snippet securely
         </h1>
         <p className="text-xl text-muted-foreground">
-          A minimalist, fast, and secure pastebin. Keep your snippets private, track view history, and set them to self-destruct.
+          A minimalist, fast, and secure snippet. Keep your snippets private, track view history, and set them to self-destruct.
         </p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
         <Button asChild size="lg" className="w-full sm:w-auto">
-          <Link href="/create-paste">Create a Paste</Link>
+          <Link href="/create-snippet">Create a Snippet</Link>
         </Button>
         <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
           <Link href="/signup">Sign Up for Free</Link>
@@ -32,13 +32,13 @@ export default function LandingPage() {
         <div className="space-y-2">
           <h3 className="text-xl font-semibold">Self-Destruct</h3>
           <p className="text-muted-foreground">
-            Set an expiration time or max views. Once the condition is met, the paste is permanently inaccessible.
+            Set an expiration time or max views. Once the condition is met, the snippet is permanently inaccessible.
           </p>
         </div>
         <div className="space-y-2">
           <h3 className="text-xl font-semibold">History Tracking</h3>
           <p className="text-muted-foreground">
-            Sign up to keep track of all your past pastes. View your previously created snippets anytime.
+            Sign up to keep track of all your past snippets. View your previously created snippets anytime.
           </p>
         </div>
       </div>

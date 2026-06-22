@@ -1,4 +1,4 @@
-import { fetchUserPastes } from "@/lib/db";
+import { fetchUserSnippets } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -12,8 +12,8 @@ export async function GET(req: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const pastes = await fetchUserPastes(session.user.id);
-    return Response.json(pastes, { status: 200 });
+    const snippets = await fetchUserSnippets(session.user.id);
+    return Response.json(snippets, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
