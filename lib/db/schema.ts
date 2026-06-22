@@ -49,7 +49,9 @@ export const verification = pgTable("verification", {
 
 export const pastes = pgTable("pastes", {
   id: text("id").primaryKey(),
+  heading: text("heading"),
   content: text("content").notNull(),
+  userId: text("user_id").references(() => user.id),
   createdAt: bigint("created_at", { mode: 'number' }).notNull(),
   expiresAt: bigint("expires_at", { mode: 'number' }),
   ttlSeconds: integer("ttl_seconds"),
