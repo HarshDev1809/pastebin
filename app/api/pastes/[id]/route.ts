@@ -69,14 +69,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (!paste) return Response.json({ error: "Paste not found" }, { status: 404 });
     if (paste.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
 
-    const url = new URL(req.url);
-    const permanent = url.searchParams.get("permanent") === "true";
-
-    if (permanent) {
-      await permanentDeletePaste(id, session.user.id);
-    } else {
-      await softDeletePaste(id, session.user.id);
-    }
+    await softDeletePaste(id, session.user.id);
 
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {

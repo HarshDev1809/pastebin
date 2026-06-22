@@ -57,7 +57,7 @@ export default function RecycleBinPage() {
   const handlePermanentDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to permanently delete this paste? This action cannot be undone.")) return;
     try {
-      const res = await fetch(`/api/pastes/${id}?permanent=true`, {
+      const res = await fetch(`/api/pastes/${id}/permanent`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete paste");
