@@ -7,6 +7,7 @@ import { signupSchema, type SignupInput } from "@/lib/validations/auth";
 import { signupAction } from "../actions";
 import Link from "next/link";
 import { toast } from "sonner";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,7 @@ export default function SignupPage() {
       }
     } catch (error: any) {
       // Allow redirect errors from better-auth or custom logic to pass
-      if (error?.message === "NEXT_REDIRECT" || error?.digest?.startsWith("NEXT_REDIRECT")) {
+      if (isRedirectError(error)) {
         throw error;
       }
       toast.error("An unexpected error occurred.");

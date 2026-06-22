@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { loginSchema, signupSchema, type LoginInput, type SignupInput } from "@/lib/validations/auth";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export async function loginAction(data: LoginInput) {
   const result = loginSchema.safeParse(data);
@@ -24,7 +25,7 @@ export async function loginAction(data: LoginInput) {
         headers: currentHeaders
       });
   } catch (err: any) {
-    if (err.message === "NEXT_REDIRECT" || err.digest?.startsWith("NEXT_REDIRECT")) {
+    if (isRedirectError(err)) {
       throw err;
     }
     const detailedError = err.body?.message || err.message || "An error occurred during login.";
@@ -59,7 +60,7 @@ export async function signupAction(data: SignupInput) {
         headers: currentHeaders
       });
   } catch (err: any) {
-    if (err.message === "NEXT_REDIRECT" || err.digest?.startsWith("NEXT_REDIRECT")) {
+    if (isRedirectError(err)) {
       throw err;
     }
     const detailedError = err.body?.message || err.message || "An error occurred during signup.";
