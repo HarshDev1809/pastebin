@@ -54,6 +54,7 @@ export const pastes = pgTable("pastes", {
   userId: text("user_id").references(() => user.id),
   createdAt: bigint("created_at", { mode: 'number' }).notNull(),
   expiresAt: bigint("expires_at", { mode: 'number' }),
+  deletedAt: bigint("deleted_at", { mode: 'number' }),
   ttlSeconds: integer("ttl_seconds"),
   remainingViews: integer("remaining_views"),
   maxViews: integer("max_views"),

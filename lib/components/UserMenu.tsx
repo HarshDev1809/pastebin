@@ -55,13 +55,13 @@ export function UserMenu() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/profile">
-              <span>Update Profile</span>
+            <Link href="/pastes">
+              <span>My Pastes</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/pastes">
-              <span>My Pastes</span>
+            <Link href="/recycle-bin">
+              <span>Recycle Bin</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

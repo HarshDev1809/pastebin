@@ -1,4 +1,6 @@
-import { fetchPaste, updateView } from "@/lib/db";
+import { fetchPaste, updateView, softDeletePaste, restorePaste, permanentDeletePaste } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -9,7 +11,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const data = await fetchPaste(id);
     if(!data)
         return Response.json({ error: "Invalid id passed" }, { status: 404 });
-    const { maxViews: max_views, content, heading, remainingViews: remaining_views, expiresAt: expires_at } = data;
+    const { maxViews: max_views, content, heading, remainingViews: remaining_views, expiresAt: expires_at, deletedAt: deleted_at } = data;
+
+    if (deleted_at !== null) {
+      return Response.json({ error: "Paste not found" }, { status: 404 });
+    }
 
     let currentTime = Date.now();
 
@@ -45,6 +51,53 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       },
       { status: 200 }
     );
+  } catch (error) {
+    console.error(error);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    if (!id) return Response.json({ error: "Invalid id passed" }, { status: 400 });
+
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+    const paste = await fetchPaste(id);
+    if (!paste) return Response.json({ error: "Paste not found" }, { status: 404 });
+    if (paste.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
+
+    await softDeletePaste(id, session.user.id);
+
+    return Response.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    if (!id) return Response.json({ error: "Invalid id passed" }, { status: 400 });
+
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session || !session.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+    const body = await req.json();
+    if (body.action !== "restore") {
+        return Response.json({ error: "Invalid action" }, { status: 400 });
+    }
+
+    const paste = await fetchPaste(id);
+    if (!paste) return Response.json({ error: "Paste not found" }, { status: 404 });
+    if (paste.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
+
+    await restorePaste(id, session.user.id);
+
+    return Response.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
