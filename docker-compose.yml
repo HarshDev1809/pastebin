@@ -3,7 +3,7 @@ services:
     build: .
     container_name: snippet-lite-app
     env_file:
-      - .env
+      - /home/hosting/pastebin/.env
     restart: unless-stopped
     networks:
       - shared-network
