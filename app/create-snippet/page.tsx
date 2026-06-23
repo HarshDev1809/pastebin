@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +31,7 @@ import { python } from "@codemirror/lang-python";
 import { cpp } from "@codemirror/lang-cpp";
 import { go } from "@codemirror/lang-go";
 import { json } from "@codemirror/lang-json";
+import { useTheme } from "next-themes";
 
 const TTL_OPTIONS = [
   { value: "0", label: "Never expire" },
@@ -63,6 +64,13 @@ const TTL_OPTIONS = [
 ];
 
 export default function CreateSnippetPage() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [heading, setHeading] = useState("");
   const [snippet, setSnippet] = useState("");
   const [language, setLanguage] = useState("plaintext");
@@ -202,7 +210,7 @@ export default function CreateSnippetPage() {
                   language === "json" ? json() : [],
                 ].flat()}
                 onChange={(value) => setSnippet(value)}
-                theme="dark"
+                theme={mounted && resolvedTheme === "dark" ? "dark" : "light"}
               />
             </div>
           </div>

@@ -24,8 +24,16 @@ import { cpp } from "@codemirror/lang-cpp";
 import { go } from "@codemirror/lang-go";
 import { json } from "@codemirror/lang-json";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export default function ViewSnippet({ params }: { params: Promise<{ id: string }> }) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState("");
@@ -184,7 +192,7 @@ export default function ViewSnippet({ params }: { params: Promise<{ id: string }
               language === "go" ? go() : [],
               language === "json" ? json() : [],
             ].flat()}
-            theme="dark"
+            theme={mounted && resolvedTheme === "dark" ? "dark" : "light"}
           />
         </CardContent>
       </Card>
