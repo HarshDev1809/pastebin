@@ -55,8 +55,8 @@ export function UserMenu() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/pastes">
-              <span>My Pastes</span>
+            <Link href="/snippets">
+              <span>My Snippets</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>

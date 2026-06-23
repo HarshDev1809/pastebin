@@ -1,4 +1,4 @@
-import { fetchPaste, updateView, softDeletePaste, restorePaste, permanentDeletePaste } from "@/lib/db";
+import { fetchSnippet, updateView, softDeleteSnippet, restoreSnippet, permanentDeleteSnippet } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -8,13 +8,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const testTime = req.headers.get("x-test-now-ms");
     if (!id)
       return Response.json({ error: "Invalid id passed" }, { status: 404 });
-    const data = await fetchPaste(id);
+    const data = await fetchSnippet(id);
     if(!data)
         return Response.json({ error: "Invalid id passed" }, { status: 404 });
-    const { maxViews: max_views, content, heading, remainingViews: remaining_views, expiresAt: expires_at, deletedAt: deleted_at } = data;
+    const { maxViews: max_views, content, heading, language, remainingViews: remaining_views, expiresAt: expires_at, deletedAt: deleted_at } = data;
 
     if (deleted_at !== null) {
-      return Response.json({ error: "Paste not found" }, { status: 404 });
+      return Response.json({ error: "Snippet not found" }, { status: 404 });
     }
 
     let currentTime = Date.now();
@@ -26,7 +26,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (expires_at !== null)
       if (Number(currentTime) >= Number(expires_at)) {
         return Response.json(
-          { error: "Paste has been expired." },
+          { error: "Snippet has been expired." },
           { status: 404 }
         );
       }
@@ -34,7 +34,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (remaining_views !== null) {
       if (Number(remaining_views) === 0)
         return Response.json(
-          { error: "Maximum Views reached for this paste" },
+          { error: "Maximum Views reached for this snippet" },
           { status: 404 }
         );
 
@@ -45,6 +45,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       {
         heading,
         content,
+        language,
         remaining_views,
         expires_at: expires_at === null ? null : new Date(Number(expires_at)).toISOString(),
         expires_at_epoch: expires_at,
@@ -65,11 +66,11 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session || !session.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-    const paste = await fetchPaste(id);
-    if (!paste) return Response.json({ error: "Paste not found" }, { status: 404 });
-    if (paste.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
+    const snippet = await fetchSnippet(id);
+    if (!snippet) return Response.json({ error: "Snippet not found" }, { status: 404 });
+    if (snippet.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
 
-    await softDeletePaste(id, session.user.id);
+    await softDeleteSnippet(id, session.user.id);
 
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {
@@ -91,11 +92,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         return Response.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    const paste = await fetchPaste(id);
-    if (!paste) return Response.json({ error: "Paste not found" }, { status: 404 });
-    if (paste.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
+    const snippet = await fetchSnippet(id);
+    if (!snippet) return Response.json({ error: "Snippet not found" }, { status: 404 });
+    if (snippet.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
 
-    await restorePaste(id, session.user.id);
+    await restoreSnippet(id, session.user.id);
 
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {

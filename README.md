@@ -1,14 +1,14 @@
-# Pastebin-Lite
+# Snippet-Lite
 
-A lightweight pastebin application where users can create text pastes with optional expiry constraints and share them via URLs.
+A lightweight snippet application where users can create text snippets with optional expiry constraints and share them via URLs.
 
 ## Features
 
-- Create text pastes with arbitrary content
-- Share pastes via unique URLs
+- Create text snippets with arbitrary content
+- Share snippets via unique URLs
 - Optional time-based expiry (TTL)
 - Optional view-count limits
-- Pastes become unavailable when constraints are triggered
+- Snippets become unavailable when constraints are triggered
 
 ## How to Run the App Locally
 
@@ -20,8 +20,8 @@ A lightweight pastebin application where users can create text pastes with optio
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/HarshDev1809/Pastebin-Lite.git
-cd pastebin-lite
+git clone https://github.com/HarshDev1809/Snippet-Lite.git
+cd snippet-lite
 ```
 
 2. Install dependencies:
@@ -42,7 +42,7 @@ npm install
    - Create a PostgreSQL database
    - Run the following SQL schema:
      ```sql
-        CREATE TABLE pastes (
+        CREATE TABLE snippets (
         id TEXT PRIMARY KEY,
         content TEXT NOT NULL,
         created_at BIGINT NOT NULL,
@@ -66,12 +66,12 @@ This application uses **PostgreSQL** as its persistence layer, hosted on Supabas
 
 **Why PostgreSQL?**
 - Provides reliable, persistent storage that survives across serverless function invocations on platforms like Vercel
-- ACID compliance ensures data integrity for paste operations
+- ACID compliance ensures data integrity for snippet operations
 - Supports efficient indexing for expiry and view count lookups
 - Handles concurrent access safely, preventing race conditions with view counts
 
 **Data Storage:**
-- Paste content and metadata are stored in a `pastes` table
+- Snippet content and metadata are stored in a `snippets` table
 - Timestamps are stored as milliseconds since epoch (BIGINT) for precision
 - View counts are tracked and decremented on each API access
 - Expiry times are indexed for fast lookup during TTL checks
@@ -85,7 +85,7 @@ All timestamps (creation time, expiry time) are stored as milliseconds since epo
 - Support for the `x-test-now-ms` header in TEST_MODE
 
 ### 2. View Count Decrement Strategy
-Each successful API call to `GET /api/pastes/:id` counts as a view and decrements the `remaining_views` counter. The decremented value is returned in the response, ensuring accurate tracking.
+Each successful API call to `GET /api/snippets/:id` counts as a view and decrements the `remaining_views` counter. The decremented value is returned in the response, ensuring accurate tracking.
 
 ### 3. TEST_MODE Support
 The application supports deterministic expiry testing via:
@@ -94,22 +94,22 @@ The application supports deterministic expiry testing via:
 - When both are present, the header value is used instead of `Date.now()` for expiry calculations
 
 ### 4. Constraint Handling
-When both TTL and max_views constraints are present, the paste becomes unavailable as soon as **either** constraint triggers (whichever comes first).
+When both TTL and max_views constraints are present, the snippet becomes unavailable as soon as **either** constraint triggers (whichever comes first).
 
 ### 5. Error Responses
 - Invalid inputs (missing content, invalid TTL/view counts) return `400 Bad Request` with JSON error messages
-- Unavailable pastes (not found, expired, view limit exceeded) consistently return `404 Not Found` with JSON responses
+- Unavailable snippets (not found, expired, view limit exceeded) consistently return `404 Not Found` with JSON responses
 - Database/server errors return `500 Internal Server Error`
 
 ### 6. XSS Protection
-Paste content is rendered safely in a `<textarea>` element which automatically escapes HTML/JavaScript, preventing script execution.
+Snippet content is rendered safely in a `<textarea>` element which automatically escapes HTML/JavaScript, preventing script execution.
 
 ## API Endpoints
 
 - `GET /api/healthz` - Health check with database connectivity test
-- `POST /api/pastes` - Create a new paste
-- `GET /api/pastes/:id` - Fetch paste metadata (API, decrements view count)
-- `GET /p/:id` - View paste content (HTML page)
+- `POST /api/snippets` - Create a new snippet
+- `GET /api/snippets/:id` - Fetch snippet metadata (API, decrements view count)
+- `GET /s/:id` - View snippet content (HTML page)
 
 ## Technologies Used
 
@@ -117,7 +117,7 @@ Paste content is rendered safely in a `<textarea>` element which automatically e
 - **React 19** - UI library
 - **PostgreSQL** - Database (via Supabase)
 - **Tailwind CSS 4** - Styling
-- **nanoid** - Unique ID generation for paste URLs
+- **nanoid** - Unique ID generation for snippet URLs
 - **pg** - PostgreSQL client for Node.js
 
 ## Deployment

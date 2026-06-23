@@ -1,4 +1,4 @@
-import { fetchPaste, permanentDeletePaste } from "@/lib/db";
+import { fetchSnippet, permanentDeleteSnippet } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -10,11 +10,11 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session || !session.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-    const paste = await fetchPaste(id);
-    if (!paste) return Response.json({ error: "Paste not found" }, { status: 404 });
-    if (paste.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
+    const snippet = await fetchSnippet(id);
+    if (!snippet) return Response.json({ error: "Snippet not found" }, { status: 404 });
+    if (snippet.userId !== session.user.id) return Response.json({ error: "Unauthorized" }, { status: 403 });
 
-    await permanentDeletePaste(id, session.user.id);
+    await permanentDeleteSnippet(id, session.user.id);
 
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {

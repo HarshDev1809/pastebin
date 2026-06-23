@@ -15,6 +15,20 @@
       "when": 1782133711408,
       "tag": "0001_gigantic_mesmero",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782160476100,
+      "tag": "0002_faulty_tag",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782161959683,
+      "tag": "0003_opposite_pepper_potts",
+      "breakpoints": true
     }
   ]
 }

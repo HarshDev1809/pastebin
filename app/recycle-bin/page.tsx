@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-interface Paste {
+interface Snippet {
   id: string;
   heading: string | null;
   content: string;
@@ -19,15 +19,15 @@ interface Paste {
 export default function RecycleBinPage() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
-  const [pastes, setPastes] = useState<Paste[]>([]);
+  const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchDeletedPastes = () => {
+  const fetchDeletedSnippets = () => {
     setLoading(true);
     fetch("/api/recycle-bin")
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) setPastes(data);
+        if (Array.isArray(data)) setSnippets(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -35,34 +35,34 @@ export default function RecycleBinPage() {
 
   useEffect(() => {
     if (session?.user) {
-      fetchDeletedPastes();
+      fetchDeletedSnippets();
     }
   }, [session]);
 
   const handleRestore = async (id: string) => {
     try {
-      const res = await fetch(`/api/pastes/${id}`, {
+      const res = await fetch(`/api/snippets/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "restore" }),
       });
-      if (!res.ok) throw new Error("Failed to restore paste");
-      toast.success("Paste restored successfully");
-      fetchDeletedPastes();
+      if (!res.ok) throw new Error("Failed to restore snippet");
+      toast.success("Snippet restored successfully");
+      fetchDeletedSnippets();
     } catch (error) {
       toast.error("An error occurred while restoring");
     }
   };
 
   const handlePermanentDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to permanently delete this paste? This action cannot be undone.")) return;
+    if (!window.confirm("Are you sure you want to permanently delete this snippet? This action cannot be undone.")) return;
     try {
-      const res = await fetch(`/api/pastes/${id}/permanent`, {
+      const res = await fetch(`/api/snippets/${id}/permanent`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Failed to delete paste");
-      toast.success("Paste permanently deleted");
-      fetchDeletedPastes();
+      if (!res.ok) throw new Error("Failed to delete snippet");
+      toast.success("Snippet permanently deleted");
+      fetchDeletedSnippets();
     } catch (error) {
       toast.error("An error occurred while deleting");
     }
@@ -87,7 +87,7 @@ export default function RecycleBinPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Recycle Bin</h1>
           <p className="text-muted-foreground mt-1">
-            View and manage your deleted pastes. Items are kept here for 7 days before permanent deletion.
+            View and manage your deleted snippets. Items are kept here for 7 days before permanent deletion.
           </p>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function RecycleBinPage() {
         <div className="flex justify-center items-center h-32">
           <Loader2 className="animate-spin h-8 w-8 text-muted-foreground" />
         </div>
-      ) : pastes.length === 0 ? (
+      ) : snippets.length === 0 ? (
         <Card className="text-center py-12">
           <CardContent>
             <p className="text-muted-foreground">Your recycle bin is empty.</p>
@@ -104,27 +104,27 @@ export default function RecycleBinPage() {
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {pastes.map((paste) => (
-            <Card key={paste.id} className="flex flex-col">
+          {snippets.map((snippet) => (
+            <Card key={snippet.id} className="flex flex-col">
               <CardHeader>
                 <CardTitle className="text-lg truncate">
-                  {paste.heading || "Untitled Paste"}
+                  {snippet.heading || "Untitled Snippet"}
                 </CardTitle>
                 <CardDescription>
-                  Deleted on {new Date(Number(paste.deletedAt)).toLocaleDateString()}
+                  Deleted on {new Date(Number(snippet.deletedAt)).toLocaleDateString()}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1">
                 <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md font-mono line-clamp-3">
-                  {paste.content}
+                  {snippet.content}
                 </div>
               </CardContent>
               <CardContent className="pt-0 mt-auto flex justify-between items-center">
-                <Button size="sm" variant="outline" onClick={() => handleRestore(paste.id)}>
+                <Button size="sm" variant="outline" onClick={() => handleRestore(snippet.id)}>
                   <RefreshCcw className="h-4 w-4 mr-2" />
                   Restore
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => handlePermanentDelete(paste.id)}>
+                <Button size="sm" variant="destructive" onClick={() => handlePermanentDelete(snippet.id)}>
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete Permanently
                 </Button>

@@ -44,9 +44,9 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
-            <h3 className="text-lg font-bold">Pastebin-Lite</h3>
+            <h3 className="text-lg font-bold">Snippet-Lite</h3>
             <p className="text-sm text-muted-foreground">
-              A minimalist, open-source pastebin for sharing code and text snippets with ease.
+              A minimalist, open-source snippet for sharing code and text snippets with ease.
             </p>
           </div>
           <div className="space-y-4">
@@ -54,7 +54,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <a 
-                  href="https://github.com/HarshDev1809/Pastebin-Lite" 
+                  href="https://github.com/HarshDev1809/Snippet-Lite"
                   target="_blank" 
                   className="flex items-center gap-1 hover:underline text-foreground/80"
                 >
@@ -62,7 +62,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <Link href="/" className="hover:underline text-foreground/80">Create Paste</Link>
+                <Link href="/" className="hover:underline text-foreground/80">Create Snippet</Link>
               </li>
             </ul>
           </div>
@@ -89,7 +89,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} Pastebin-Lite. Built by Harsh Dev.</p>
+          <p>© {new Date().getFullYear()} Snippet-Lite. Built by Harsh Dev.</p>
           <div className="flex gap-4">
             <Link href="/" className="hover:text-foreground">Terms</Link>
             <Link href="/" className="hover:text-foreground">Privacy</Link>

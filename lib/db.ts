@@ -1,11 +1,12 @@
 import { db } from "./db/index";
-import { pastes } from "./db/schema";
+import { snippets } from "./db/schema";
 import { eq, desc, and, isNull, isNotNull } from "drizzle-orm";
 
-export const savePaste = async (
+export const saveSnippet = async (
   id: string,
   heading: string | null,
   content: string,
+  language: string,
   userId: string | null,
   currentTime: number,
   expiryTime: number | null,
@@ -13,10 +14,11 @@ export const savePaste = async (
   max_views: number | null = null
 ) => {
   try {
-    await db.insert(pastes).values({
+    await db.insert(snippets).values({
       id,
       heading,
       content,
+      language,
       userId,
       createdAt: currentTime,
       expiresAt: expiryTime,
@@ -30,9 +32,9 @@ export const savePaste = async (
   }
 };
 
-export const fetchPaste = async (id: string) => {
+export const fetchSnippet = async (id: string) => {
   try {
-    const data = await db.select().from(pastes).where(eq(pastes.id, id));
+    const data = await db.select().from(snippets).where(eq(snippets.id, id));
     return data[0] || null;
   } catch (error) {
     console.error(error);
@@ -42,78 +44,78 @@ export const fetchPaste = async (id: string) => {
 
 export const updateView = async (id: string, updatedView: number) => {
   try {
-    await db.update(pastes).set({ remainingViews: updatedView }).where(eq(pastes.id, id));
+    await db.update(snippets).set({ remainingViews: updatedView }).where(eq(snippets.id, id));
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const fetchUserPastes = async (userId: string) => {
+export const fetchUserSnippets = async (userId: string) => {
   try {
     return await db
       .select()
-      .from(pastes)
-      .where(and(eq(pastes.userId, userId), isNull(pastes.deletedAt)))
-      .orderBy(desc(pastes.createdAt));
+      .from(snippets)
+      .where(and(eq(snippets.userId, userId), isNull(snippets.deletedAt)))
+      .orderBy(desc(snippets.createdAt));
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const fetchSoftDeletedUserPastes = async (userId: string) => {
+export const fetchSoftDeletedUserSnippets = async (userId: string) => {
   try {
     return await db
       .select()
-      .from(pastes)
-      .where(and(eq(pastes.userId, userId), isNotNull(pastes.deletedAt)))
-      .orderBy(desc(pastes.deletedAt));
+      .from(snippets)
+      .where(and(eq(snippets.userId, userId), isNotNull(snippets.deletedAt)))
+      .orderBy(desc(snippets.deletedAt));
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const softDeletePaste = async (id: string, userId: string) => {
+export const softDeleteSnippet = async (id: string, userId: string) => {
   try {
-    const paste = await fetchPaste(id);
-    if (!paste || paste.userId !== userId) {
-      throw new Error("Unauthorized or Paste not found");
+    const snippet = await fetchSnippet(id);
+    if (!snippet || snippet.userId !== userId) {
+      throw new Error("Unauthorized or Snippet not found");
     }
     await db
-      .update(pastes)
+      .update(snippets)
       .set({ deletedAt: Date.now() })
-      .where(eq(pastes.id, id));
+      .where(eq(snippets.id, id));
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const restorePaste = async (id: string, userId: string) => {
+export const restoreSnippet = async (id: string, userId: string) => {
   try {
-    const paste = await fetchPaste(id);
-    if (!paste || paste.userId !== userId) {
-      throw new Error("Unauthorized or Paste not found");
+    const snippet = await fetchSnippet(id);
+    if (!snippet || snippet.userId !== userId) {
+      throw new Error("Unauthorized or Snippet not found");
     }
     await db
-      .update(pastes)
+      .update(snippets)
       .set({ deletedAt: null })
-      .where(eq(pastes.id, id));
+      .where(eq(snippets.id, id));
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const permanentDeletePaste = async (id: string, userId: string) => {
+export const permanentDeleteSnippet = async (id: string, userId: string) => {
   try {
-    const paste = await fetchPaste(id);
-    if (!paste || paste.userId !== userId) {
-      throw new Error("Unauthorized or Paste not found");
+    const snippet = await fetchSnippet(id);
+    if (!snippet || snippet.userId !== userId) {
+      throw new Error("Unauthorized or Snippet not found");
     }
-    await db.delete(pastes).where(eq(pastes.id, id));
+    await db.delete(snippets).where(eq(snippets.id, id));
   } catch (error) {
     console.error(error);
     throw error;

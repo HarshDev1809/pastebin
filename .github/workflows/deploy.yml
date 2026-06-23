@@ -1,0 +1,49 @@
+name: Snippet Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build check          # validates build works
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pastebin
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          BETTER_AUTH_SECRET: better_auth_secret_placeholder_for_ci_32_characters
+        run: npm run build
+
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: self-hosted
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build & restart container
+        run: docker compose up -d --build
+
+      - name: Clean up old images
+        run: docker image prune -f
