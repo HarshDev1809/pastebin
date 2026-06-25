@@ -45,7 +45,7 @@ jobs:
       - name: Build & restart container
         run: |
           set -a
-          source /path/to/your/.env
+          source /home/hosting/env/pastebin.env
           set +a
           docker compose up -d --build
 
