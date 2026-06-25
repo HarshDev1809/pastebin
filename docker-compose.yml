@@ -1,6 +1,11 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
     container_name: snippet-lite-app
     env_file:
       - /home/hosting/env/pastebin.env
